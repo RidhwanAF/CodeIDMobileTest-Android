@@ -157,10 +157,17 @@ class AuthViewModel @Inject constructor(
     fun login() {
         viewModelScope.launch {
             if (_uiState.value.isLoading) return@launch
+            if (email.isBlank() || password.isBlank()) {
+                _uiState.update {
+                    it.copy(
+                        errorMessage = "Email and password cannot be empty"
+                    )
+                }
+                return@launch
+            }
             _uiState.update { it.copy(isLoading = true) }
             loginUserUseCase(email, password).fold(
                 onSuccess = { token ->
-//                    saveTokenSessionUseCase(token)
                     Log.d(TAG, "login: $token")
                     _uiState.update {
                         it.copy(
