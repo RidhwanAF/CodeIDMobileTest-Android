@@ -1,38 +1,21 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.dagger.hilt.android)
-    alias(libs.plugins.serialization)
 }
 
 android {
-    namespace = "com.raf.mobiletaskcodeidtest"
+    namespace = "com.raf.mobiletaskcodeidtest.home"
     compileSdk {
         version = release(36)
     }
-
     defaultConfig {
-        applicationId = "com.raf.mobiletaskcodeidtest"
         minSdk = 26
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -50,12 +33,6 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":core"))
-    implementation(project(":feature:auth"))
-    implementation(project(":feature:settings"))
-    implementation(project(":feature:home"))
-    implementation(project(":feature:profile"))
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -71,8 +48,7 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-    // Navigation
-    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.compose.material.icons.extended)
     // Animation
     implementation(libs.androidx.animation)
     // Dagger Hilt
@@ -80,9 +56,6 @@ dependencies {
     ksp(libs.dagger.hilt.android.compiler)
     ksp(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
-    // Retrofit
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.gson)
-    // OkHttp
-    implementation(libs.logging.interceptor)
+    // Couchbase
+    implementation(libs.couchbase.lite.ktx)
 }
