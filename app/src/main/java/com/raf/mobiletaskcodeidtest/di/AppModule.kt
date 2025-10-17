@@ -1,10 +1,7 @@
 package com.raf.mobiletaskcodeidtest.di
 
 import android.content.Context
-import com.raf.mobiletaskcodeidtest.auth.data.local.AuthDataStore
 import com.raf.mobiletaskcodeidtest.auth.data.repository.AuthRepositoryImpl
-import com.raf.mobiletaskcodeidtest.auth.domain.repository.AuthRepository
-import com.raf.mobiletaskcodeidtest.auth.domain.usecase.SaveTokenSessionUseCase
 import com.raf.mobiletaskcodeidtest.core.domain.contract.AppSettingsProvider
 import com.raf.mobiletaskcodeidtest.core.domain.contract.AuthTokenProvider
 import com.raf.mobiletaskcodeidtest.core.domain.usecase.GetAppSettingsUseCase
@@ -24,31 +21,15 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
     /**
-     * Auth
+     * Auth Global
      */
     @Provides
     @Singleton
-    fun provideAuthDataStore(@ApplicationContext context: Context) = AuthDataStore(context)
-
-    @Provides
-    @Singleton
-    fun provideAuthRepository(
-        authDataStore: AuthDataStore,
-    ): AuthRepository = AuthRepositoryImpl(
-        authDataStore = authDataStore,
-    )
-
-    @Provides
-    @Singleton
-    fun provideAuthTokenProvider(repository: AuthRepositoryImpl): AuthTokenProvider = repository
-
-    @Provides
-    @Singleton
-    fun provideSaveTokenSessionUseCase(repository: AuthRepositoryImpl) =
-        SaveTokenSessionUseCase(repository)
+    fun provideAuthTokenProvider(repository: AuthRepositoryImpl): AuthTokenProvider =
+        repository
 
     /**
-     * Settings
+     * Settings Global
      */
     @Provides
     @Singleton

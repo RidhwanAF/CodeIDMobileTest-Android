@@ -1,12 +1,15 @@
 package com.raf.mobiletaskcodeidtest.auth.presentation.viewmodel
 
+import android.util.Log
 import android.util.Patterns
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.raf.mobiletaskcodeidtest.auth.domain.usecase.SaveTokenSessionUseCase
+import com.raf.mobiletaskcodeidtest.auth.domain.model.User
+import com.raf.mobiletaskcodeidtest.auth.domain.usecase.LoginUseCase
+import com.raf.mobiletaskcodeidtest.auth.domain.usecase.RegisterUserUseCase
 import com.raf.mobiletaskcodeidtest.core.domain.model.AppSettings
 import com.raf.mobiletaskcodeidtest.core.domain.usecase.GetAppSettingsUseCase
 import com.raf.mobiletaskcodeidtest.core.domain.usecase.SetAppSettingsUseCase
@@ -20,9 +23,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val saveTokenSessionUseCase: SaveTokenSessionUseCase,
     private val setAppSettingsUseCase: SetAppSettingsUseCase,
     private val getAppSettingsUseCase: GetAppSettingsUseCase,
+    private val registerUserUseCase: RegisterUserUseCase,
+    private val loginUserUseCase: LoginUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AuthUiState())
@@ -68,6 +72,16 @@ class AuthViewModel @Inject constructor(
         getAppSettings()
     }
 
+    fun resetState() {
+        _uiState.update {
+            it.copy(
+                isLoading = false,
+                errorMessage = null,
+                registeredUser = null,
+            )
+        }
+    }
+
     /**
      * Data Validation
      */
@@ -109,6 +123,18 @@ class AuthViewModel @Inject constructor(
         isPasswordConfirmationError = !isValid
     }
 
+    fun clearInputData() {
+        email = ""
+        password = ""
+        passwordConfirmation = ""
+        emailErrorMessage = ""
+        passwordErrorMessage = ""
+        passwordConfirmationErrorMessage = ""
+        isEmailError = false
+        isPasswordError = false
+        isPasswordConfirmationError = false
+    }
+
     /**
      * Login
      */
@@ -130,7 +156,28 @@ class AuthViewModel @Inject constructor(
 
     fun login() {
         viewModelScope.launch {
-
+            if (_uiState.value.isLoading) return@launch
+            _uiState.update { it.copy(isLoading = true) }
+            loginUserUseCase(email, password).fold(
+                onSuccess = { token ->
+//                    saveTokenSessionUseCase(token)
+                    Log.d(TAG, "login: $token")
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = null,
+                        )
+                    }
+                },
+                onFailure = { throwable ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = throwable.localizedMessage ?: "Login failed"
+                        )
+                    }
+                }
+            )
         }
     }
 
@@ -165,11 +212,37 @@ class AuthViewModel @Inject constructor(
             this.isPasswordConfirmationVisible = it
             validatePasswordConfirmation()
         }
+        resetState()
     }
 
     fun register() {
+        if (_uiState.value.isLoading) return
+        _uiState.update { it.copy(isLoading = true) }
+        val newUser = User(
+            userId = "", // Generate in Data Layer,
+            email = email,
+            password = passwordConfirmation,
+        )
         viewModelScope.launch {
-
+            registerUserUseCase(newUser).fold(
+                onSuccess = { registeredUser ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = null,
+                            registeredUser = registeredUser
+                        )
+                    }
+                },
+                onFailure = { throwable ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = throwable.localizedMessage ?: "Registration failed"
+                        )
+                    }
+                }
+            )
         }
     }
 
@@ -192,5 +265,9 @@ class AuthViewModel @Inject constructor(
             setAppSettingsUseCase(appSettings)
             getAppSettings()
         }
+    }
+
+    companion object {
+        private const val TAG = "AuthViewModel"
     }
 }

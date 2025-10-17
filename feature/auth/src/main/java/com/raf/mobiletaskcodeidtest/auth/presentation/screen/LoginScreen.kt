@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
@@ -106,6 +107,7 @@ fun SharedTransitionScope.LoginScreen(
                 .verticalScroll(scrollState)
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp)
+                .animateContentSize()
         ) {
             OutlinedTextField(
                 value = viewModel.email,
@@ -204,6 +206,14 @@ fun SharedTransitionScope.LoginScreen(
                     .fillMaxWidth()
                     .widthIn(max = 220.dp)
             )
+            uiState.errorMessage?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
             Button(
                 onClick = {
@@ -255,6 +265,7 @@ fun SharedTransitionScope.LoginScreen(
             TextButton(
                 onClick = {
                     onNavigateToRegister.invoke()
+                    viewModel.resetState()
                 },
                 modifier = Modifier
                     .sharedElement(

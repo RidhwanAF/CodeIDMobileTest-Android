@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
@@ -22,11 +23,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
@@ -105,6 +108,7 @@ fun SharedTransitionScope.RegisterScreen(
                 .verticalScroll(scrollState)
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp)
+                .animateContentSize()
         ) {
             OutlinedTextField(
                 value = viewModel.email,
@@ -275,6 +279,14 @@ fun SharedTransitionScope.RegisterScreen(
                     .fillMaxWidth()
                     .widthIn(max = 220.dp)
             )
+            uiState.errorMessage?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
             Button(
                 onClick = {
@@ -328,6 +340,7 @@ fun SharedTransitionScope.RegisterScreen(
             TextButton(
                 onClick = {
                     onNavigateToLogin.invoke()
+                    viewModel.resetState()
                 },
                 modifier = Modifier
                     .sharedElement(
@@ -343,5 +356,47 @@ fun SharedTransitionScope.RegisterScreen(
                 )
             }
         }
+    }
+
+    // Success Dialog
+    uiState.registeredUser?.let { user ->
+        AlertDialog(
+            onDismissRequest = {
+                viewModel.resetState()
+                onNavigateToLogin.invoke()
+                viewModel.clearInputData()
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.resetState()
+                        onNavigateToLogin.invoke()
+                        viewModel.clearInputData()
+                    }
+                ) {
+                    Text(text = "OK")
+                }
+            },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = "Success"
+                )
+            },
+            title = {
+                Text(
+                    text = "Registration Successful",
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            text = {
+                Text(
+                    text = "${user.email} registered successfully",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        )
     }
 }

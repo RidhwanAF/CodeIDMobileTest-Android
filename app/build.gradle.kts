@@ -83,4 +83,6 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
     // OkHttp
     implementation(libs.logging.interceptor)
+    // Couchbase
+    implementation(libs.couchbase.lite.ktx)
 }
