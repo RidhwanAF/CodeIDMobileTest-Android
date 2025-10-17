@@ -6,7 +6,6 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -105,7 +104,7 @@ fun SharedTransitionScope.SettingsDialog(
                 modifier = modifier
                     .sharedElement(
                         sharedContentState = rememberSharedContentState("settings-dialog-key"),
-                        animatedVisibilityScope = this@AnimatedVisibility
+                        animatedVisibilityScope = this@AnimatedVisibility,
                     )
                     .graphicsLayer {
                         scaleX = (1f - backProgress).coerceAtLeast(0.85f)
@@ -251,9 +250,6 @@ private fun SharedTransitionScope.DarkTheme(
                     DarkTheme.LIGHT -> "Light"
                     DarkTheme.DARK -> "Dark"
                 }
-                val iconColorAnimation by animateColorAsState(
-                    targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
-                )
 
                 Box(
                     contentAlignment = Alignment.Center,
@@ -284,12 +280,12 @@ private fun SharedTransitionScope.DarkTheme(
                             onDarkThemeChange.invoke(darkTheme)
                         },
                         modifier = Modifier
-                            .zIndex(3f)
+                            .zIndex(10f)
                     ) {
                         Icon(
                             imageVector = imageVector,
                             contentDescription = title,
-                            tint = iconColorAnimation
+                            tint = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
                         )
                     }
                 }

@@ -21,8 +21,8 @@ daggerHilt = "2.57.2"
 coilCompose = "3.3.0"
 composeAnimation = "1.9.3"
 uiTextGoogleFonts = "1.9.3"
-appcompat = "1.7.1"
-material = "1.13.0"
+pagination = "3.3.6"
+couchbase-lite="3.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -60,8 +60,11 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 ## OkHttp
 logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+## Paging
+paging-runtime-ktx = { group = "androidx.paging", name = "paging-runtime-ktx", version.ref = "pagination" }
+paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "pagination" }
+## Couch Base
+couchbase-lite-ktx = { group = "com.couchbase.lite", name = "couchbase-lite-android-ktx", version.ref = "couchbase-lite" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

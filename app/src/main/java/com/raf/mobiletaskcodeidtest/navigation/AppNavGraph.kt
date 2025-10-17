@@ -9,6 +9,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.raf.mobiletaskcodeidtest.auth.presentation.screen.LoginScreen
+import com.raf.mobiletaskcodeidtest.auth.presentation.screen.RegisterScreen
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -27,10 +29,22 @@ fun AppNavGraph(
                 startDestination = AppRoute.Login,
             ) {
                 composable<AppRoute.Login> {
-
+                    LoginScreen(
+                        animatedContentScope = this@composable,
+                        onNavigateToRegister = {
+                            navController.navigate(AppRoute.Register) {
+                                launchSingleTop = true
+                            }
+                        }
+                    )
                 }
                 composable<AppRoute.Register> {
-
+                    RegisterScreen(
+                        animatedContentScope = this@composable,
+                        onNavigateToLogin = {
+                            navController.navigateUp()
+                        }
+                    )
                 }
             }
 

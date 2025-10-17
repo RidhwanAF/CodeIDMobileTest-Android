@@ -63,4 +63,6 @@ dependencies {
     ksp(libs.dagger.hilt.android.compiler)
     ksp(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    // Couchbase
+    implementation(libs.couchbase.lite.ktx)
 }
