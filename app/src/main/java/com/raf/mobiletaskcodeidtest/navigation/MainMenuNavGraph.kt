@@ -11,15 +11,17 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.raf.mobiletaskcodeidtest.profile.presentation.screen.ProfileScreen
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.MainMenuNavGraph(
 ) {
     val navController = rememberNavController()
+
     NavHost(
         navController = navController,
-        startDestination = MainMenuRoute.Home
+        startDestination = MainMenuRoute.Profile
     ) {
         composable<MainMenuRoute.Home> {
             Box(
@@ -30,12 +32,7 @@ fun SharedTransitionScope.MainMenuNavGraph(
             }
         }
         composable<MainMenuRoute.Profile> {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Text(text = "Profile")
-            }
+            ProfileScreen()
         }
     }
 }
