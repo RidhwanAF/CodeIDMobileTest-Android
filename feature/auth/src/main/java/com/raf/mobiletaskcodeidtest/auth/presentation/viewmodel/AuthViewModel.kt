@@ -152,6 +152,7 @@ class AuthViewModel @Inject constructor(
         showPassword?.let {
             this.isPasswordVisible = it
         }
+        resetState()
     }
 
     fun login() {
