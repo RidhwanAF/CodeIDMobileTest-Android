@@ -55,6 +55,7 @@ class AuthRepositoryImpl @Inject constructor(
                 return@withContext Result.failure(Exception("Invalid email or password"))
             }
 
+            // Simulate password validation
             val decryptedPassword = SessionEncryptionManager.decrypt(storedEncryptedPassword)
             if (decryptedPassword != password) {
                 Log.w(TAG, "Login: Invalid password")
@@ -64,7 +65,7 @@ class AuthRepositoryImpl @Inject constructor(
             val sessionToken = SessionEncryptionManager.encrypt(userId) ?: userId
             authDataStore.saveSessionToken(sessionToken)
 
-            return@withContext Result.success(userId)
+            return@withContext Result.success(sessionToken)
         } catch (e: Exception) {
             Log.e(TAG, "loginUser: ${e.message}", e)
             return@withContext Result.failure(e)
