@@ -1,14 +1,13 @@
 package com.raf.mobiletaskcodeidtest.auth.data.di
 
 import android.content.Context
-import com.couchbase.lite.CouchbaseLite
 import com.couchbase.lite.Database
-import com.couchbase.lite.DatabaseConfiguration
 import com.raf.mobiletaskcodeidtest.auth.data.local.AuthDataStore
 import com.raf.mobiletaskcodeidtest.auth.data.repository.AuthRepositoryImpl
 import com.raf.mobiletaskcodeidtest.auth.domain.repository.AuthRepository
 import com.raf.mobiletaskcodeidtest.auth.domain.usecase.LoginUseCase
 import com.raf.mobiletaskcodeidtest.auth.domain.usecase.RegisterUserUseCase
+import com.raf.mobiletaskcodeidtest.auth.domain.usecase.SaveSessionUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,17 +18,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AuthModule {
-    /**
-     * Couchbase DB
-     */
-    @Provides
-    @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): Database {
-        CouchbaseLite.init(context)
-        val config = DatabaseConfiguration()
-        return Database("user_db", config)
-    }
-
     @Provides
     @Singleton
     fun provideAuthDataStore(@ApplicationContext context: Context) = AuthDataStore(context)
@@ -52,4 +40,8 @@ object AuthModule {
     @Provides
     @Singleton
     fun provideLoginUseCase(repository: AuthRepository) = LoginUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideSaveSessionUseCase(repository: AuthRepository) = SaveSessionUseCase(repository)
 }

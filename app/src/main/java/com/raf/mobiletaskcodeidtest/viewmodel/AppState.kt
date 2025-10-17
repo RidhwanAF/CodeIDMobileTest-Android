@@ -4,5 +4,9 @@ import com.raf.mobiletaskcodeidtest.core.domain.model.AppSettings
 
 sealed class AppState {
     object Loading : AppState()
-    data class Loaded(val isLoggedIn: Boolean, val appSettings: AppSettings) : AppState()
+    data class Loaded(
+        val isLoggedIn: Boolean,
+        val appSettings: AppSettings,
+        val isUserHasProfileAlready: Boolean,
+    ) : AppState()
 }

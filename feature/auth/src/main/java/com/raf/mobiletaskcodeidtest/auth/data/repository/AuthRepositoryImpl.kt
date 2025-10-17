@@ -25,6 +25,19 @@ class AuthRepositoryImpl @Inject constructor(
     private val database: Database,
 ) : AuthTokenProvider, AuthRepository {
 
+    override suspend fun saveSessionToken(token: String) {
+        try {
+            val encryptedToken = SessionEncryptionManager.encrypt(token)
+            if (encryptedToken == null) {
+                Log.e(TAG, "saveSessionToken: Failed to encrypt token")
+                return
+            }
+            authDataStore.saveSessionToken(encryptedToken)
+        } catch (e: Exception) {
+            Log.e(TAG, "saveSessionToken: ${e.message}", e)
+        }
+    }
+
     override suspend fun loginUser(
         email: String,
         password: String,
@@ -62,10 +75,7 @@ class AuthRepositoryImpl @Inject constructor(
                 return@withContext Result.failure(Exception("Invalid email or password"))
             }
 
-            val sessionToken = SessionEncryptionManager.encrypt(userId) ?: userId
-            authDataStore.saveSessionToken(sessionToken)
-
-            return@withContext Result.success(sessionToken)
+            return@withContext Result.success(userId)
         } catch (e: Exception) {
             Log.e(TAG, "loginUser: ${e.message}", e)
             return@withContext Result.failure(e)

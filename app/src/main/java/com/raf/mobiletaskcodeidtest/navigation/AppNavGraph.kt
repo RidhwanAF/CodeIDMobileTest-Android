@@ -17,6 +17,7 @@ import com.raf.mobiletaskcodeidtest.auth.presentation.screen.RegisterScreen
 fun AppNavGraph(
     navController: NavHostController,
     startDestination: AppRoute,
+    isUserHasProfileAlready: Boolean,
 ) {
     SharedTransitionLayout(
         modifier = Modifier.fillMaxSize()
@@ -49,7 +50,9 @@ fun AppNavGraph(
             }
 
             composable<AppRoute.MainMenu> {
-                MainMenuNavGraph()
+                MainMenuNavGraph(
+                    isUserHasProfileAlready = isUserHasProfileAlready
+                )
             }
         }
     }

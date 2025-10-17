@@ -4,4 +4,5 @@ data class Profile(
     val userId: String,
     val email: String,
     val name: String,
+    val picturePath: String,
 )

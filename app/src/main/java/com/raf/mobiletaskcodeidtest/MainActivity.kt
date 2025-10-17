@@ -70,7 +70,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     AppNavGraph(
                         navController = navController,
-                        startDestination = startDestination
+                        startDestination = startDestination,
+                        isUserHasProfileAlready = appData.isUserHasProfileAlready
                     )
                 }
             }

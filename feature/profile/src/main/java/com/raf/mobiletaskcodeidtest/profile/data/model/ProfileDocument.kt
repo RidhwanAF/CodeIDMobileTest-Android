@@ -4,4 +4,6 @@ data class ProfileDocument(
     val userId: String,
     val email: String,
     val name: String,
+    val picturePath: String,
+    val type: String = "profile"
 )

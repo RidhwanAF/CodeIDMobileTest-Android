@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.raf.mobiletaskcodeidtest.auth.domain.model.User
 import com.raf.mobiletaskcodeidtest.auth.domain.usecase.LoginUseCase
 import com.raf.mobiletaskcodeidtest.auth.domain.usecase.RegisterUserUseCase
+import com.raf.mobiletaskcodeidtest.auth.domain.usecase.SaveSessionUseCase
 import com.raf.mobiletaskcodeidtest.core.domain.model.AppSettings
 import com.raf.mobiletaskcodeidtest.core.domain.usecase.GetAppSettingsUseCase
 import com.raf.mobiletaskcodeidtest.core.domain.usecase.SetAppSettingsUseCase
@@ -27,6 +28,7 @@ class AuthViewModel @Inject constructor(
     private val getAppSettingsUseCase: GetAppSettingsUseCase,
     private val registerUserUseCase: RegisterUserUseCase,
     private val loginUserUseCase: LoginUseCase,
+    private val saveSessionUseCase: SaveSessionUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AuthUiState())
@@ -170,6 +172,7 @@ class AuthViewModel @Inject constructor(
             loginUserUseCase(email, password).fold(
                 onSuccess = { token ->
                     Log.d(TAG, "login: $token")
+                    saveSessionUseCase(token)
                     _uiState.update {
                         it.copy(
                             isLoading = false,
