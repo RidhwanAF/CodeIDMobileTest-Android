@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -75,10 +76,13 @@ fun SharedTransitionScope.ProfilePictureView(
                     Image(
                         bitmap = bitmap.asImageBitmap(),
                         contentDescription = label,
+                        alignment = Alignment.Center,
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .sharedElement(
                                 sharedContentState = rememberSharedContentState("full-screen-image-dialog-${label}"),
-                                animatedVisibilityScope = this@AnimatedVisibility
+                                animatedVisibilityScope = this@AnimatedVisibility,
+                                clipInOverlayDuringTransition = OverlayClip(CircleShape)
                             )
                             .fillMaxSize()
                     )

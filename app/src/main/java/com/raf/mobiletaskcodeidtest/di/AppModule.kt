@@ -8,6 +8,7 @@ import com.raf.mobiletaskcodeidtest.auth.data.repository.AuthRepositoryImpl
 import com.raf.mobiletaskcodeidtest.core.domain.contract.AppSettingsProvider
 import com.raf.mobiletaskcodeidtest.core.domain.contract.AuthTokenProvider
 import com.raf.mobiletaskcodeidtest.core.domain.contract.ProfileProvider
+import com.raf.mobiletaskcodeidtest.core.domain.usecase.GetAccountInfoUseCase
 import com.raf.mobiletaskcodeidtest.core.domain.usecase.GetAppSettingsUseCase
 import com.raf.mobiletaskcodeidtest.core.domain.usecase.GetIsUserAvailableUseCase
 import com.raf.mobiletaskcodeidtest.core.domain.usecase.GetTokenSessionUseCase
@@ -78,6 +79,11 @@ object AppModule {
     @Singleton
     fun provideGetTokenSessionUseCase(authTokenProvider: AuthTokenProvider) =
         GetTokenSessionUseCase(authTokenProvider)
+
+    @Provides
+    @Singleton
+    fun provideGetAccountInfoUseCase(authTokenProvider: AuthTokenProvider) =
+        GetAccountInfoUseCase(authTokenProvider)
 
     @Provides
     @Singleton

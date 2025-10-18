@@ -1,5 +1,6 @@
 package com.raf.mobiletaskcodeidtest.profile.presentation.screen
 
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +25,7 @@ import com.raf.mobiletaskcodeidtest.core.R
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.IntroductionScreen(
+    animatedContentScope: AnimatedContentScope,
     onNavigateToCreateProfile: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
@@ -51,7 +53,15 @@ fun SharedTransitionScope.IntroductionScreen(
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
             )
-            Button(onClick = onNavigateToCreateProfile, modifier = Modifier.padding(16.dp)) {
+            Button(
+                onClick = onNavigateToCreateProfile,
+                modifier = Modifier
+                    .sharedElement(
+                        sharedContentState = rememberSharedContentState("introduction-button"),
+                        animatedVisibilityScope = animatedContentScope
+                    )
+                    .padding(16.dp)
+            ) {
                 Text(text = "Tap to Create Profile")
             }
         }

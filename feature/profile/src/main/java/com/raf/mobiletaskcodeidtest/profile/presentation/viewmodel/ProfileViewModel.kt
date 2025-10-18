@@ -5,13 +5,19 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raf.mobiletaskcodeidtest.core.domain.model.AppSettings
+import com.raf.mobiletaskcodeidtest.core.domain.usecase.GetAccountInfoUseCase
 import com.raf.mobiletaskcodeidtest.core.domain.usecase.GetAppSettingsUseCase
 import com.raf.mobiletaskcodeidtest.core.domain.usecase.GetTokenSessionUseCase
 import com.raf.mobiletaskcodeidtest.core.domain.usecase.LogoutUseCase
 import com.raf.mobiletaskcodeidtest.core.domain.usecase.SetAppSettingsUseCase
+import com.raf.mobiletaskcodeidtest.profile.domain.model.Profile
 import com.raf.mobiletaskcodeidtest.profile.domain.usecase.GetProfileUseCase
 import com.raf.mobiletaskcodeidtest.profile.domain.usecase.UpdateProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,6 +42,7 @@ class ProfileViewModel @Inject constructor(
     private val logoutUseCase: LogoutUseCase,
     private val getProfileUseCase: GetProfileUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
+    private val getAccountInfoUseCase: GetAccountInfoUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -46,16 +53,90 @@ class ProfileViewModel @Inject constructor(
         getProfile()
     }
 
+    /**
+     * Create Profile
+     */
+    var profilePictureInput by mutableStateOf<Uri?>(null)
+        private set
+
+    var nameInput by mutableStateOf("")
+        private set
+
+    fun onProfilePictureInputChange(newValue: Uri?) {
+        profilePictureInput = newValue
+    }
+
+    fun onNameInputChange(newValue: String) {
+        nameInput = newValue
+    }
+
+    fun resetInputs() {
+        profilePictureInput = null
+        nameInput = ""
+    }
+
+    fun registerProfile(onFinish: () -> Unit) {
+        viewModelScope.launch {
+            val userId = getTokenSessionUseCase.invoke().first()
+            if (userId == null) {
+                showErrorMessage("User not found")
+                Log.e(TAG, "User not found")
+                return@launch
+            }
+            val secureUriString = withContext(Dispatchers.IO) {
+                try {
+                    if (profilePictureInput == null) return@withContext null
+                    val inputStream =
+                        application.contentResolver.openInputStream(profilePictureInput!!)
+                            ?: return@withContext null
+
+                    val file = File(
+                        application.filesDir,
+                        "profile_picture_${System.currentTimeMillis()}.jpg"
+                    )
+
+                    FileOutputStream(file).use { outputStream ->
+                        inputStream.use { input ->
+                            input.copyTo(outputStream)
+                        }
+                    }
+                    val contentUri: Uri = FileProvider.getUriForFile(
+                        application,
+                        FILE_PROVIDER_AUTHORITY,
+                        file
+                    )
+                    contentUri.toString()
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to save and generate secure URI for image", e)
+                    null
+                }
+            }
+
+            val newProfile = Profile(
+                userId = userId,
+                email = "",
+                name = nameInput,
+                picturePath = secureUriString ?: ""
+            )
+            updateProfileUseCase.invoke(newProfile)
+            onFinish()
+        }
+    }
+
+    /**
+     * Profile
+     */
     private fun getProfile() {
         viewModelScope.launch {
             val userId = getTokenSessionUseCase().first() ?: return@launch
+            val email = getAccountInfoUseCase(userId) ?: ""
+
             getProfileUseCase(userId).fold(
                 onSuccess = { profile ->
                     _uiState.update {
-                        it.copy(
-                            profile = profile
-                        )
+                        it.copy(profile = profile.copy(email = email))
                     }
+                    nameInput = profile.name
                     Log.d(TAG, "getProfile: $profile")
                 },
                 onFailure = { throwable ->
@@ -70,17 +151,28 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             val imagePath = withContext(Dispatchers.IO) {
                 try {
-                    val inputStream = application.contentResolver.openInputStream(uri)
-                    val file = File(application.filesDir, "profile_picture_${System.currentTimeMillis()}.jpg")
-                    val outputStream = FileOutputStream(file)
-                    inputStream?.use { input ->
-                        outputStream.use { output ->
-                            input.copyTo(output)
+                    val inputStream =
+                        application.contentResolver.openInputStream(uri)
+                            ?: return@withContext null
+
+                    val file = File(
+                        application.filesDir,
+                        "profile_picture_${System.currentTimeMillis()}.jpg"
+                    )
+
+                    FileOutputStream(file).use { outputStream ->
+                        inputStream.use { input ->
+                            input.copyTo(outputStream)
                         }
                     }
-                    file.absolutePath
+                    val contentUri: Uri = FileProvider.getUriForFile(
+                        application,
+                        FILE_PROVIDER_AUTHORITY,
+                        file
+                    )
+                    contentUri.toString()
                 } catch (e: Exception) {
-                    Log.e(TAG, "Failed to save image", e)
+                    Log.e(TAG, "Failed to save and generate secure URI for image", e)
                     null
                 }
             }
@@ -99,11 +191,29 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun loadProfileImageBitmap(): Bitmap? {
-        Log.d(TAG, "loadProfileImageBitmap: ${_uiState.value.profile?.picturePath}")
-        if (_uiState.value.profile?.picturePath == null) return null
-        val imagePath = _uiState.value.profile?.picturePath
-        return BitmapFactory.decodeFile(imagePath)
+    fun onEditProfileNameSave(onFinish: () -> Unit) {
+        viewModelScope.launch {
+            val newProfile = _uiState.value.profile?.copy(
+                name = nameInput
+            )
+            if (newProfile == null) return@launch
+            updateProfileUseCase(newProfile)
+            getProfile()
+            onFinish()
+        }
+    }
+
+    fun loadProfileImageBitmap(uri: Uri?): Bitmap? {
+        if (uri == null) return null
+
+        return try {
+            application.contentResolver.openInputStream(uri)?.use { inputStream ->
+                BitmapFactory.decodeStream(inputStream)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error loading bitmap from URI: $uri", e)
+            null
+        }
     }
 
     private fun showErrorMessage(message: String) {
@@ -147,5 +257,6 @@ class ProfileViewModel @Inject constructor(
 
     companion object {
         private const val TAG = "ProfileViewModel"
+        private const val FILE_PROVIDER_AUTHORITY = "com.raf.mobiletaskcodeidtest.fileprovider"
     }
 }

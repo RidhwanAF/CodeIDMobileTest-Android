@@ -142,7 +142,6 @@ fun SharedTransitionScope.LogoutDialog(
                         Text(
                             text = "Logout",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }

@@ -13,6 +13,13 @@ import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,6 +27,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
@@ -27,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -69,7 +78,7 @@ fun SharedTransitionScope.FullScreenImageDialog(
                 .background(Color.Black.copy(alpha = (1.0f - backProgress).coerceAtLeast(0.25f)))
         ) {
             val state = rememberTransformableState { zoomChange, offsetChange, _ ->
-                scale = (scale * zoomChange).coerceIn(1f, 5f)
+                scale = (scale * zoomChange).coerceIn(-0.985f, 5f)
                 offset += offsetChange
             }
             Image(
@@ -79,7 +88,8 @@ fun SharedTransitionScope.FullScreenImageDialog(
                 modifier = Modifier
                     .sharedElement(
                         sharedContentState = rememberSharedContentState("full-screen-image-dialog-${label}"),
-                        animatedVisibilityScope = this@AnimatedVisibility
+                        animatedVisibilityScope = this@AnimatedVisibility,
+                        clipInOverlayDuringTransition = OverlayClip(CircleShape)
                     )
                     .scale((1f - backProgress).coerceAtLeast(0.85f))
                     .fillMaxSize()
@@ -91,6 +101,20 @@ fun SharedTransitionScope.FullScreenImageDialog(
                     )
                     .transformable(state = state)
             )
+            FilledTonalIconButton(
+                onClick = {
+                    onDismissRequest.invoke()
+                },
+                modifier = Modifier
+                    .padding(16.dp)
+                    .systemBarsPadding()
+                    .align(Alignment.TopEnd)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Close"
+                )
+            }
         }
     }
 }

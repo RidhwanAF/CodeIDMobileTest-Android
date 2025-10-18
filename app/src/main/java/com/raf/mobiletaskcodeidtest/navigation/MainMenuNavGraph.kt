@@ -20,27 +20,26 @@ fun SharedTransitionScope.MainMenuNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = if (isUserHasProfileAlready) MainMenuRoute.Home else MainMenuRoute.Introduction
+        startDestination = if (isUserHasProfileAlready) MainMenuRoute.Profile else MainMenuRoute.Introduction
     ) {
         composable<MainMenuRoute.Home> {
             HomeScreen()
         }
         composable<MainMenuRoute.Introduction> {
             IntroductionScreen(
+                animatedContentScope = this@composable,
                 onNavigateToCreateProfile = {
                     navController.navigate(MainMenuRoute.CreateProfile) {
                         launchSingleTop = true
-                        popUpTo(MainMenuRoute.Introduction) {
-                            inclusive = true
-                        }
                     }
                 }
             )
         }
         composable<MainMenuRoute.CreateProfile> {
             CreateProfileScreen(
+                animatedContentScope = this@composable,
                 onNavigateToHome = {
-                    navController.navigate(MainMenuRoute.Home) {
+                    navController.navigate(MainMenuRoute.Profile) {
                         launchSingleTop = true
                         popUpTo(MainMenuRoute.CreateProfile) {
                             inclusive = true

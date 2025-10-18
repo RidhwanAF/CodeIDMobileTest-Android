@@ -52,7 +52,7 @@ class ProfileRepositoryImpl @Inject constructor(
             val documentDict = results.first().getDictionary(0)
             val profile = Profile(
                 userId = documentDict?.getString("user_id") ?: "",
-                email = documentDict?.getString("email") ?: "",
+                email = "", // In Account
                 name = documentDict?.getString("name") ?: "",
                 picturePath = documentDict?.getString("picture_path") ?: ""
             )
@@ -68,7 +68,6 @@ class ProfileRepositoryImpl @Inject constructor(
             val profileDocumentData = profile.toProfileDocument()
             val document = MutableDocument(profileDocumentData.userId).apply {
                 setString("user_id", profileDocumentData.userId)
-                setString("email", profileDocumentData.email)
                 setString("name", profileDocumentData.name)
                 setString("picture_path", profileDocumentData.picturePath)
                 setString("type", profileDocumentData.type)

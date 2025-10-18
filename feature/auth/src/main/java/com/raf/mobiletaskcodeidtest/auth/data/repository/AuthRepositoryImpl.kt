@@ -25,6 +25,29 @@ class AuthRepositoryImpl @Inject constructor(
     private val database: Database,
 ) : AuthTokenProvider, AuthRepository {
 
+    override suspend fun getAccountInfo(userId: String): String? {
+        try {
+            val collection = database.getCollection(COLLECTION) ?: return null
+
+            val query = QueryBuilder
+                .select(SelectResult.property("email"))
+                .from(DataSource.collection(collection))
+                .where(Expression.property("id").equalTo(Expression.string(userId)))
+
+            val results = query.execute().allResults()
+            Log.d(TAG, "Account Info: $results")
+            if (results.isEmpty()) {
+                Log.w(TAG, "No Account Info for userId: $userId")
+                return null
+            } else {
+                return results.first()?.getString("email")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get Account Info", e)
+            return null
+        }
+    }
+
     override suspend fun saveSessionToken(token: String) {
         try {
             val encryptedToken = SessionEncryptionManager.encrypt(token)

@@ -7,7 +7,6 @@ import com.raf.mobiletaskcodeidtest.profile.domain.model.Profile
 object ProfileMapper {
     fun Profile.toProfileDocument() = ProfileDocument(
         userId = userId,
-        email = email,
         name = name,
         picturePath = picturePath,
         type = "profile"
@@ -15,7 +14,6 @@ object ProfileMapper {
 
     fun MutableDocument.toProfileDocument() = ProfileDocument(
         userId = getString("user_id") ?: id,
-        email = getString("email") ?: "",
         name = getString("name") ?: "",
         picturePath = getString("picture_path") ?: ""
     )
