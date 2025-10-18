@@ -19,3 +19,101 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+# ==============================================================================
+# COUCHBASE LITE RULES
+# These rules are necessary to prevent issues with JNI/native code access.
+# ==============================================================================
+
+# EnclosingMethod is required to use InnerClasses.
+-keepattributes Signature, InnerClasses, EnclosingMethod
+
+# Retrofit does reflection on method and parameter annotations.
+-keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
+
+# Keep annotation default values (e.g., retrofit2.http.Field.encoded).
+-keepattributes AnnotationDefault
+
+# Retain service method parameters when optimizing.
+-keepclassmembers,allowshrinking,allowobfuscation interface * {
+    @retrofit2.http.* <methods>;
+}
+
+# Ignore annotation used for build tooling.
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+
+# Ignore JSR 305 annotations for embedding nullability information.
+-dontwarn javax.annotation.**
+
+# Guarded by a NoClassDefFoundError try/catch and only used when on the classpath.
+-dontwarn kotlin.Unit
+
+# Top-level functions that can only be used by Kotlin.
+-dontwarn retrofit2.KotlinExtensions
+-dontwarn retrofit2.KotlinExtensions$*
+
+# With R8 full mode, it sees no subtypes of Retrofit interfaces since they are created with a Proxy
+# and replaces all potential values with null. Explicitly keeping the interfaces prevents this.
+-if interface * { @retrofit2.http.* <methods>; }
+-keep,allowobfuscation interface <1>
+
+# Keep inherited services.
+-if interface * { @retrofit2.http.* <methods>; }
+-keep,allowobfuscation interface * extends <1>
+
+# With R8 full mode generic signatures are stripped for classes that are not
+# kept. Suspend functions are wrapped in continuations where the type argument
+# is used.
+-keep,allowoptimization,allowshrinking,allowobfuscation class kotlin.coroutines.Continuation
+
+# R8 full mode strips generic signatures from return types if not kept.
+-if interface * { @retrofit2.http.* public *** *(...); }
+-keep,allowoptimization,allowshrinking,allowobfuscation class <3>
+
+# With R8 full mode generic signatures are stripped for classes that are not kept.
+-keep,allowoptimization,allowshrinking,allowobfuscation class retrofit2.Response
+
+# JSR 305 annotations are for embedding nullability information.
+-dontwarn javax.annotation.**
+
+# Animal Sniffer compileOnly dependency to ensure APIs are compatible with older versions of Java.
+-dontwarn org.codehaus.mojo.animal_sniffer.*
+
+# OkHttp platform used only on JVM and when Conscrypt and other security providers are available.
+# May be used with robolectric or deliberate use of Bouncy Castle on Android
+-dontwarn okhttp3.internal.platform.**
+-dontwarn org.conscrypt.**
+-dontwarn org.bouncycastle.**
+
+# Keep all classes annotated with @Serializable and their serializers
+-keep class kotlinx.serialization.** { *; }
+-keep @kotlinx.serialization.Serializable class * { *; }
+-keepclassmembers class ** {
+    *** Companion;
+}
+-keepclassmembers class * {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+# COUCHBASE LITE PROGUARD RULES
+# Keep the top-level class and its methods that handle the native library loading.
+-keep class com.couchbase.lite.CouchbaseLite {
+    public *;
+}
+
+# Keep the internal native library loader class
+-keep class com.couchbase.lite.internal.NativeLibrary {
+    public *;
+}
+-keep class com.couchbase.lite.ConnectionStatus { <init>(...); }
+-keep class com.couchbase.lite.LiteCoreException { static <methods>; }
+-keep class com.couchbase.lite.internal.replicator.CBLTrustManager {
+    public java.util.List checkServerTrusted(java.security.cert.X509Certificate[], java.lang.String, java.lang.String);
+}
+-keep class com.couchbase.lite.internal.core.C4* {
+    static <methods>;
+    <fields>;
+    <init>(...);
+}
+-keep class com.couchbase.lite.internal.fleece.FLSliceResult {
+    static <methods>;
+}
