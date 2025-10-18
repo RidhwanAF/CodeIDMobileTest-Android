@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.raf.mobiletaskcodeidtest.auth.presentation.screen.LoginScreen
 import com.raf.mobiletaskcodeidtest.auth.presentation.screen.RegisterScreen
+import com.raf.mobiletaskcodeidtest.navigation.mainmenu.MainMenuNavGraph
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable

@@ -9,6 +9,7 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -55,6 +57,7 @@ import com.raf.mobiletaskcodeidtest.profile.presentation.viewmodel.ProfileViewMo
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.ProfileScreen(
+    parentPaddingValues: PaddingValues = PaddingValues(),
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -72,6 +75,10 @@ fun SharedTransitionScope.ProfileScreen(
             if (uri == null) return@rememberLauncherForActivityResult
             viewModel.onEditProfilePicture(uri)
         }
+
+    val profileImageBitmap = remember(uiState.profile?.picturePath) {
+        viewModel.loadProfileImageBitmap(uiState.profile?.picturePath?.toUri())
+    }
 
     // Error Message
     LaunchedEffect(uiState.errorMessage) {
@@ -112,6 +119,7 @@ fun SharedTransitionScope.ProfileScreen(
                     .fillMaxSize()
                     .verticalScroll(scrollState)
                     .padding(innerPadding)
+                    .padding(bottom = parentPaddingValues.calculateBottomPadding())
                     .padding(horizontal = 16.dp)
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
@@ -120,7 +128,7 @@ fun SharedTransitionScope.ProfileScreen(
                     visible = dialogState != ProfileDialogState.PROFILE_PICTURE,
                     label = uiState.profile?.name
                         ?: stringResource(com.couchbase.lite.R.string.app_name),
-                    bitmap = viewModel.loadProfileImageBitmap(uiState.profile?.picturePath?.toUri()),
+                    bitmap = profileImageBitmap,
                     onEditClick = {
                         pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                     },

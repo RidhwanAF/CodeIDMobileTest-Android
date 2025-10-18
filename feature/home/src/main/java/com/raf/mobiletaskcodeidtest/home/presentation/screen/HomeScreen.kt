@@ -3,6 +3,7 @@ package com.raf.mobiletaskcodeidtest.home.presentation.screen
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -22,7 +23,8 @@ import com.raf.mobiletaskcodeidtest.home.presentation.viewmodel.HomeViewModel
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel()
+    parentPaddingValues: PaddingValues = PaddingValues(),
+    viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val scrollState = rememberScrollState()
@@ -47,6 +49,7 @@ fun SharedTransitionScope.HomeScreen(
                 .fillMaxSize()
                 .verticalScroll(scrollState)
                 .padding(innerPadding)
+                .padding(bottom = parentPaddingValues.calculateBottomPadding())
         ) {
 
         }

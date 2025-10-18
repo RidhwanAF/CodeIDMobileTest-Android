@@ -29,6 +29,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -65,6 +66,10 @@ fun SharedTransitionScope.CreateProfileScreen(
         mutableStateOf(false)
     }
 
+    val profileImageBitmap = remember(viewModel.profilePictureInput) {
+        viewModel.loadProfileImageBitmap(viewModel.profilePictureInput)
+    }
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.fillMaxSize()
@@ -98,9 +103,8 @@ fun SharedTransitionScope.CreateProfileScreen(
                 ProfilePictureView(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     visible = !showFullScreenImageDialog,
-                    label = uiState.profile?.name
-                        ?: stringResource(com.couchbase.lite.R.string.app_name),
-                    bitmap = viewModel.loadProfileImageBitmap(viewModel.profilePictureInput),
+                    label = viewModel.nameInput.ifBlank { stringResource(com.couchbase.lite.R.string.app_name) },
+                    bitmap = profileImageBitmap,
                     onEditClick = {
                         pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                     },

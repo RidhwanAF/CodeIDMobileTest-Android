@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import javax.inject.Inject
 
@@ -210,6 +211,9 @@ class ProfileViewModel @Inject constructor(
             application.contentResolver.openInputStream(uri)?.use { inputStream ->
                 BitmapFactory.decodeStream(inputStream)
             }
+        } catch (e: FileNotFoundException) {
+            Log.e(TAG, "Error loading bitmap from URI: $uri", e)
+            null
         } catch (e: Exception) {
             Log.e(TAG, "Error loading bitmap from URI: $uri", e)
             null
