@@ -2,17 +2,16 @@ package com.raf.mobiletaskcodeidtest.navigation
 
 import kotlinx.serialization.Serializable
 
-@Serializable
 sealed class AppRoute {
     @Serializable
-    object Auth : AppRoute() // Auth Parent
+    data object Auth : AppRoute() // Auth Parent
 
     @Serializable
-    object Login : AppRoute()
+    data object Login : AppRoute()
 
     @Serializable
-    object Register : AppRoute()
+    data object Register : AppRoute()
 
     @Serializable
-    object MainMenu : AppRoute()
+    data object MainMenu : AppRoute()
 }

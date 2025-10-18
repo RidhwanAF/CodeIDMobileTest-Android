@@ -40,6 +40,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -81,11 +82,8 @@ dependencies {
     ksp(libs.dagger.hilt.android.compiler)
     ksp(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
-    // Retrofit
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.gson)
-    // OkHttp
-    implementation(libs.logging.interceptor)
     // Couchbase
     implementation(libs.couchbase.lite.ktx)
+    // Serialization
+    implementation(libs.kotlinx.serialization.json)
 }

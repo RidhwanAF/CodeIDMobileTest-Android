@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.dagger.hilt.android)
+    alias(libs.plugins.serialization)
 }
 
 android {
@@ -23,6 +24,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -56,6 +58,21 @@ dependencies {
     ksp(libs.dagger.hilt.android.compiler)
     ksp(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
-    // Couchbase
-    implementation(libs.couchbase.lite.ktx)
+    // Room
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    implementation(libs.room.paging)
+    ksp(libs.room.compiler)
+    // Serialization
+    implementation(libs.kotlinx.serialization.json)
+    // Coil
+    implementation(libs.coil.compose)
+    // Paging Remote
+    implementation(libs.paging.compose)
+    implementation(libs.paging.runtime.ktx)
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    // OkHttp
+    implementation(libs.logging.interceptor)
 }

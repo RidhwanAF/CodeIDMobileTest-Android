@@ -13,11 +13,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.raf.mobiletaskcodeidtest.home.presentation.screen.DetailScreen
 import com.raf.mobiletaskcodeidtest.home.presentation.screen.HomeScreen
+import com.raf.mobiletaskcodeidtest.home.presentation.viewmodel.HomeViewModel
 import com.raf.mobiletaskcodeidtest.profile.presentation.screen.CreateProfileScreen
 import com.raf.mobiletaskcodeidtest.profile.presentation.screen.IntroductionScreen
 import com.raf.mobiletaskcodeidtest.profile.presentation.screen.ProfileScreen
@@ -35,6 +39,8 @@ fun SharedTransitionScope.MainMenuNavGraph(
         listMainMenuBottomBar.find { route ->
             route.route.isOnThisRoute(context, currentBackStackEntry)
         }
+
+    val homeViewModel = hiltViewModel<HomeViewModel>()
 
     Scaffold(
         bottomBar = {
@@ -64,7 +70,31 @@ fun SharedTransitionScope.MainMenuNavGraph(
         ) {
             composable<MainMenuRoute.Home> {
                 HomeScreen(
-                    parentPaddingValues = parentPadding
+                    animatedContentScope = this@composable,
+                    viewModel = homeViewModel,
+                    parentPaddingValues = parentPadding,
+                    onNavigationDetail = { id, name ->
+                        navController.navigate(
+                            MainMenuRoute.Detail(
+                                id = id,
+                                name = name
+                            )
+                        ) {
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
+            composable<MainMenuRoute.Detail> {
+                val pokemonData = it.toRoute<MainMenuRoute.Detail>()
+                DetailScreen(
+                    animatedContentScope = this@composable,
+                    id = pokemonData.id,
+                    name = pokemonData.name,
+                    viewModel = homeViewModel,
+                    onNavigateBack = {
+                        navController.navigateUp()
+                    }
                 )
             }
             composable<MainMenuRoute.Introduction> {

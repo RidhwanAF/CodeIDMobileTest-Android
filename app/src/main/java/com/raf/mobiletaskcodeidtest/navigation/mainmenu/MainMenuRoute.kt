@@ -4,19 +4,24 @@ import android.content.Context
 import androidx.navigation.NavBackStackEntry
 import kotlinx.serialization.Serializable
 
-@Serializable
 sealed class MainMenuRoute {
     @Serializable
-    object Introduction : MainMenuRoute()
+    data object Introduction : MainMenuRoute()
 
     @Serializable
-    object Home : MainMenuRoute()
+    data object Home : MainMenuRoute()
 
     @Serializable
-    object CreateProfile : MainMenuRoute()
+    data class Detail(
+        val id: String? = null,
+        val name: String? = null,
+    ) : MainMenuRoute()
 
     @Serializable
-    object Profile : MainMenuRoute()
+    data object CreateProfile : MainMenuRoute()
+
+    @Serializable
+    data object Profile : MainMenuRoute()
 }
 
 fun MainMenuRoute.isOnThisRoute(
