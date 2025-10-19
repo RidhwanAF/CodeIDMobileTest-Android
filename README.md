@@ -15,7 +15,16 @@
 2.  Open the project in Android Studio.
 3.  Let Android Studio download the required Gradle dependencies.
 
-### Demo
+## Stacks, Techs, Frameworks, Libraries
+1. Jetpack Compose
+2. Clean Code Architecture & Multi Module & MVVM
+3. Pagination 3 Remote Mediator
+4. Retrofit
+5. Room for Pagination and Caching
+6. Couchbase Lite Database for Saving data User, Auth
+7. Coroutine
+8. Material 3
 
+## Demo
 https://github.com/user-attachments/assets/316637e2-2d62-42fa-a22b-c9b26fcb66f5
 
