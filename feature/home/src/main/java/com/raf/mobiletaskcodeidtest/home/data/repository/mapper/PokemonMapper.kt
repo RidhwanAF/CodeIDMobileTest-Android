@@ -1,5 +1,6 @@
 package com.raf.mobiletaskcodeidtest.home.data.repository.mapper
 
+import com.raf.mobiletaskcodeidtest.home.data.local.PokemonAbilityData
 import com.raf.mobiletaskcodeidtest.home.data.local.PokemonData
 import com.raf.mobiletaskcodeidtest.home.data.model.EffectEntry
 import com.raf.mobiletaskcodeidtest.home.data.model.PokemonAbilityApiResponse
@@ -13,18 +14,28 @@ object PokemonMapper {
         url = url
     )
 
-    fun PokemonAbilityApiResponse.toDomain(): PokemonAbility {
+    fun PokemonAbilityData.roomToDomain(): PokemonAbility {
+        return PokemonAbility(
+            id = this.id,
+            effect = this.effect,
+            shortEffect = this.shortEffect,
+            pokemonNames = this.pokemonNames,
+        )
+    }
+
+    fun PokemonAbilityApiResponse.toRoomEntity(pokemonId: String): PokemonAbilityData {
         fun findEnglishText(entries: List<EffectEntry>): EffectEntry? {
             return entries.find { it.language.name == "en" }
         }
 
         val englishEffectEntry = findEnglishText(this.effectEntries)
 
-        return PokemonAbility(
+        return PokemonAbilityData(
             id = this.id,
             effect = englishEffectEntry?.effect ?: "Effect not found.",
             shortEffect = englishEffectEntry?.shortEffect ?: "Summary not found.",
-            pokemonNames = this.pokemon.map { it.pokemon.name }
+            pokemonNames = this.pokemon.map { it.pokemon.name },
+            pokemonId = pokemonId
         )
     }
 }

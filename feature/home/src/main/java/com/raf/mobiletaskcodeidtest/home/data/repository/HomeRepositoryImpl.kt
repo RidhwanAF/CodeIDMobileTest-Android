@@ -6,10 +6,13 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import androidx.room.withTransaction
 import com.raf.mobiletaskcodeidtest.home.data.local.room.PokemonDatabase
 import com.raf.mobiletaskcodeidtest.home.data.paging.PokemonRemoteMediator
 import com.raf.mobiletaskcodeidtest.home.data.remote.PokemonApiService
+import com.raf.mobiletaskcodeidtest.home.data.repository.mapper.PokemonMapper.roomToDomain
 import com.raf.mobiletaskcodeidtest.home.data.repository.mapper.PokemonMapper.toDomain
+import com.raf.mobiletaskcodeidtest.home.data.repository.mapper.PokemonMapper.toRoomEntity
 import com.raf.mobiletaskcodeidtest.home.domain.model.Pokemon
 import com.raf.mobiletaskcodeidtest.home.domain.model.PokemonAbility
 import com.raf.mobiletaskcodeidtest.home.domain.repository.HomeRepository
@@ -57,21 +60,36 @@ class HomeRepositoryImpl @Inject constructor(
         try {
             val response = apiService.getPokemonDetail(idOrName)
             if (response.isSuccessful) {
-                val body = response.body()?.toDomain()
-                return if (body != null) {
-                    Log.d(TAG, "getPokemonAbilityDetail: $body")
-                    Result.success(body)
+                val body = response.body()?.toRoomEntity(idOrName)
+                if (body != null) {
+                    database.withTransaction {
+                        Log.d(TAG, "Saving To Local Pokemon Ability: $body")
+                        database.pokemonDao().insertAbility(body)
+                    }
+                    return Result.success(body.roomToDomain())
                 } else {
                     Log.e(TAG, "getPokemonAbilityDetail: Response body is null")
-                    Result.failure(Exception("Response body is null"))
                 }
             } else {
-                Log.e(TAG, "getPokemonAbilityDetail: API request failed with code ${response.code()}")
-                return Result.failure(Exception("API request failed with code ${response.code()}"))
+                Log.e(
+                    TAG,
+                    "getPokemonAbilityDetail: API request failed with code ${response.code()}"
+                )
             }
         } catch (e: Exception) {
-            Log.e(TAG, "getPokemonAbilityDetail: ", e)
-            return Result.failure(e)
+            Log.w(TAG, "getPokemonAbilityDetail: Failed to fetch from network, trying local DB", e)
+        }
+
+        val localAbility = database.pokemonDao().getPokemonAbilities(idOrName)
+        return if (localAbility != null) {
+            Log.d(TAG, "getPokemonAbilityDetail: Loaded from local DB: $localAbility")
+            Result.success(localAbility.roomToDomain())
+        } else {
+            Log.e(
+                TAG,
+                "getPokemonAbilityDetail: Failed to fetch from network and not available in local DB."
+            )
+            Result.failure(Exception("Failed to fetch ability from both network and local storage."))
         }
     }
 

@@ -69,7 +69,7 @@ class HomeViewModel @Inject constructor(
                 onFailure = { throwable ->
                     showErrorMessage(throwable.localizedMessage ?: "Unknown error")
                     _uiState.update {
-                        it.copy(isGettingAbility = false)
+                        it.copy(isGettingAbility = false, pokemonAbility = null)
                     }
                 }
             )

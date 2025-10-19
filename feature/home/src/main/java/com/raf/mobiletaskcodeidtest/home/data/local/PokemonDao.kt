@@ -15,9 +15,15 @@ interface PokemonDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(items: List<PokemonData>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAbility(abilities: PokemonAbilityData)
+
     @Query("DELETE FROM pokemon")
     suspend fun clearAll()
 
     @Query("SELECT * FROM pokemon WHERE name LIKE '%' || :query || '%' OR :query IS NULL OR :query = ''")
     fun getItemsBySearch(query: String?): Flow<List<PokemonData>>
+
+    @Query("SELECT * FROM pokemon_ability WHERE pokemonId = :id")
+    suspend fun getPokemonAbilities(id: String): PokemonAbilityData?
 }
