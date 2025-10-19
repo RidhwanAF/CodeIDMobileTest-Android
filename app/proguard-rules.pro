@@ -93,27 +93,18 @@
 -keepclassmembers class * {
     kotlinx.serialization.KSerializer serializer(...);
 }
+-keepnames class * implements java.io.Serializable
+
+# Keep special serialization methods and the serialVersionUID field
+-keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    private void readObjectNoData();
+}
+-dontwarn com.raf.mobiletaskcodeidtest.navigation.**
+-keep class com.raf.mobiletaskcodeidtest.navigation.** { *; }
 
 # COUCHBASE LITE PROGUARD RULES
-# Keep the top-level class and its methods that handle the native library loading.
--keep class com.couchbase.lite.CouchbaseLite {
-    public *;
-}
-
-# Keep the internal native library loader class
--keep class com.couchbase.lite.internal.NativeLibrary {
-    public *;
-}
--keep class com.couchbase.lite.ConnectionStatus { <init>(...); }
--keep class com.couchbase.lite.LiteCoreException { static <methods>; }
--keep class com.couchbase.lite.internal.replicator.CBLTrustManager {
-    public java.util.List checkServerTrusted(java.security.cert.X509Certificate[], java.lang.String, java.lang.String);
-}
--keep class com.couchbase.lite.internal.core.C4* {
-    static <methods>;
-    <fields>;
-    <init>(...);
-}
--keep class com.couchbase.lite.internal.fleece.FLSliceResult {
-    static <methods>;
-}
+-keep class com.couchbase.lite.** { *; }
+-dontwarn com.couchbase.lite.**

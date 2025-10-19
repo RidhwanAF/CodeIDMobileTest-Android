@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.navigation.NavBackStackEntry
 import kotlinx.serialization.Serializable
 
+@Serializable
 sealed class MainMenuRoute {
     @Serializable
     data object Introduction : MainMenuRoute()
